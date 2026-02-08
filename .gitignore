@@ -1,0 +1,25 @@
+# Environment files with secrets
+.env
+
+# Backups (should be backed up separately, not in git)
+backups/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# SSH keys (if anyone accidentally copies here)
+*.pem
+*.key
+id_rsa*

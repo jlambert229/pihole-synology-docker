@@ -1,0 +1,55 @@
+# Pi-hole Adlists — Curated blocklists
+#
+# Format: url,enabled,comment
+# enabled: 1 = active, 0 = disabled (available but not blocking)
+#
+# Applied by: ./apply-config.sh
+#
+# Tiers:
+#   Essential  — High-quality, well-maintained, low false positives
+#   Recommended — Broader coverage, occasional false positive
+#   Aggressive  — Maximum blocking, expect some breakage (disabled by default)
+#
+# ──────────────────────────────────────────────────────────────
+# Essential — start here
+# ──────────────────────────────────────────────────────────────
+
+# StevenBlack unified hosts — ads + malware (Pi-hole default)
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts,1,StevenBlack unified hosts (default)
+
+# OISD Big — one of the most popular all-in-one lists
+# Curated from 50+ sources, aggressive dedup, actively maintained
+https://big.oisd.nl/domainswild2,1,OISD Big — comprehensive all-in-one
+
+# HaGeZi Multi Pro — fast-growing, excellent maintenance
+# Blocks ads, tracking, metrics, telemetry, phishing, malware
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/pro.txt,1,HaGeZi Multi Pro — ads/tracking/malware
+
+# ──────────────────────────────────────────────────────────────
+# Recommended — broader coverage
+# ──────────────────────────────────────────────────────────────
+
+# Firebog — curated "ticked" (safe) lists
+# These are individually selected by the Firebog community as low-FP
+https://v.firebog.net/hosts/AdguardDNS.txt,1,Firebog: AdGuard DNS filter
+https://v.firebog.net/hosts/Easylist.txt,1,Firebog: EasyList
+https://v.firebog.net/hosts/Easyprivacy.txt,1,Firebog: EasyPrivacy — tracking
+https://v.firebog.net/hosts/Prigent-Ads.txt,1,Firebog: Prigent Ads
+
+# Malware / phishing protection
+https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt,1,DandelionSprout Anti-Malware
+https://osint.digitalside.it/Threat-Intel/lists/latestdomains.txt,1,DigitalSide Threat Intel
+https://phishing.army/download/phishing_army_blocklist_extended.txt,1,Phishing Army — extended
+
+# ──────────────────────────────────────────────────────────────
+# Aggressive — disabled by default (flip to 1 if you want max blocking)
+# ──────────────────────────────────────────────────────────────
+
+# HaGeZi Ultimate — very aggressive, will break some things
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/ultimate.txt,0,HaGeZi Ultimate — aggressive (expect breakage)
+
+# OISD NSFW — blocks adult content (useful for family networks)
+https://nsfw.oisd.nl/domainswild2,0,OISD NSFW — adult content filter
+
+# StevenBlack fakenews + gambling extensions
+https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts,0,StevenBlack fakenews + gambling

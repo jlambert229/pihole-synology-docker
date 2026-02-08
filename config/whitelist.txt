@@ -1,0 +1,105 @@
+# Pi-hole Whitelist — Domains commonly broken by blocklists
+#
+# These are well-known services that aggressive lists sometimes catch.
+# Each entry is tested against community reports (anudeepND, Reddit, Discourse).
+#
+# Format: one domain per line. Lines starting with # are comments.
+# Applied by: ./apply-config.sh
+#
+# ──────────────────────────────────────────────────────────────
+# Microsoft — login, updates, services
+# ──────────────────────────────────────────────────────────────
+login.microsoftonline.com
+login.live.com
+outlook.office365.com
+products.office.com
+c.s-microsoft.com
+i.s-microsoft.com
+dl.delivery.mp.microsoft.com
+geo-prod.do.dsp.mp.microsoft.com
+displaycatalog.mp.microsoft.com
+sls.update.microsoft.com.akadns.net
+fe3cr.delivery.mp.microsoft.com
+tsfe.trafficshaping.dsp.mp.microsoft.com
+
+# ──────────────────────────────────────────────────────────────
+# Apple — updates, services, captive portal
+# ──────────────────────────────────────────────────────────────
+captive.apple.com
+gsp-ssl.ls.apple.com
+gsp-ssl.ls-apple.com.akadns.net
+gspe1-ssl.ls.apple.com
+mesu.apple.com
+oscp.apple.com
+swscan.apple.com
+appldnld.apple.com
+updates-http.cdn-apple.com
+
+# ──────────────────────────────────────────────────────────────
+# Google — safe browsing, fonts, APIs
+# ──────────────────────────────────────────────────────────────
+clients2.google.com
+clients4.google.com
+clients5.google.com
+fonts.googleapis.com
+fonts.gstatic.com
+googleapis.com
+safebrowsing.googleapis.com
+
+# ──────────────────────────────────────────────────────────────
+# Amazon / AWS — shopping, Alexa, CDN
+# ──────────────────────────────────────────────────────────────
+s3.amazonaws.com
+amazonaws.com
+cdn.ampproject.org
+alexa.amazon.com
+
+# ──────────────────────────────────────────────────────────────
+# Streaming — Netflix, Spotify, YouTube
+# ──────────────────────────────────────────────────────────────
+api-global.netflix.com
+appboot.netflix.com
+apresolve.spotify.com
+spclient.wg.spotify.com
+i.ytimg.com
+s.youtube.com
+video-stats.l.google.com
+
+# ──────────────────────────────────────────────────────────────
+# Gaming — Steam, PlayStation, Xbox
+# ──────────────────────────────────────────────────────────────
+steamcommunity.com
+store.steampowered.com
+api.steampowered.com
+clientconfig.passport.net
+activity.windows.com
+nexusrules.officeapps.live.com
+
+# ──────────────────────────────────────────────────────────────
+# Samsung Smart TV — Smart Hub, apps, services
+# ──────────────────────────────────────────────────────────────
+auth.samsungosp.com
+samsungcloudsolution.com
+samsungcloudsolution.net
+samsungosp.com
+samsungotn.net
+osb.samsungqbe.com
+prov.samsungcloudsolution.com
+infolink.pavv.co.kr
+otnprd11.samsungcloudsolution.net
+otnprd8.samsungcloudsolution.net
+otn.samsungcloudcdn.com
+lcprd1.samsungcloudsolution.net
+os.samsungtv.net
+d179kwmlpc4o47.cloudfront.net
+www.samsungosp.com
+ns11.whois.co.kr
+
+# ──────────────────────────────────────────────────────────────
+# CDNs / Infrastructure — commonly caught by overzealous lists
+# ──────────────────────────────────────────────────────────────
+cdn.jsdelivr.net
+cdnjs.cloudflare.com
+raw.githubusercontent.com
+gist.github.com
+github.com

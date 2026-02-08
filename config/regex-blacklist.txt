@@ -1,0 +1,47 @@
+# Pi-hole Regex Blacklist — Pattern-based blocking
+#
+# Catches domains that rotate subdomains or use predictable naming.
+# More powerful than exact-match blocklists for these patterns.
+#
+# Format: one regex per line (POSIX ERE). Lines starting with # are comments.
+# Applied by: ./apply-config.sh
+#
+# ⚠️  Test new patterns at: https://regex101.com (set flavor to POSIX ERE)
+#     Or: pihole-FTL regex-test "somedomain.com" "your-regex"
+
+# ──────────────────────────────────────────────────────────────
+# Ad / tracking pixel patterns
+# ──────────────────────────────────────────────────────────────
+
+# Catch-all for common ad server naming patterns
+^ad([sxv]?[0-9]*|system|click|server|delivery|banner|exchange|network)\.
+^(.+[-_.])?(ads|adserver|adtech|adservice|adtrack|advertising|adnxs|adform)\..+\..+$
+
+# Tracking pixels and beacons
+^(.+[-_.])?(pixel|track(er|ing)?|beacon|telemetry|metrics|analytics)\..+\..+$
+
+# ──────────────────────────────────────────────────────────────
+# Telemetry — app/OS phone-home
+# ──────────────────────────────────────────────────────────────
+
+# Samsung TV telemetry
+^(.+\.)?samsungads\.com$
+^(.+\.)?samsungacr\.com$
+
+# Roku telemetry
+^(.+\.)?logs\.roku\.com$
+
+# Xiaomi telemetry
+^(.+[-_.])?(tracking|telemetry)\.miui\.com$
+
+# ──────────────────────────────────────────────────────────────
+# Malware / suspicious TLD patterns
+# ──────────────────────────────────────────────────────────────
+
+# Extremely long subdomains (often DGA malware)
+^.{100,}\..+$
+
+# ──────────────────────────────────────────────────────────────
+# Clickbait / content farms
+# ──────────────────────────────────────────────────────────────
+^(.+[-_.])?(taboola|outbrain|revcontent|mgid|contentad)\.
