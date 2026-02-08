@@ -2,6 +2,8 @@
 
 First off, thanks for taking the time to contribute! 🎉
 
+**Note:** This repo uses **Pi-hole v6** (February 2025+) with Alpine base image and `FTLCONF_` environment variable syntax. Please test contributions against v6, not v5.
+
 ## How Can I Contribute?
 
 ### Reporting Issues
@@ -22,6 +24,9 @@ Have a better blocklist recommendation?
 - Tier (Essential/Recommended/Aggressive)
 - Testing you've done (how long, what sites/services)
 - Known false positives
+- Comparison to current recommendations (HaGeZi Pro, OISD Big as of 2026)
+
+**Note:** As of 2026, HaGeZi is considered best-in-class. New suggestions should explain advantages over current defaults.
 
 ### Whitelist Additions
 
@@ -61,9 +66,12 @@ Before submitting a PR, verify:
 
 - [ ] Scripts are executable (`chmod +x`)
 - [ ] Scripts run without errors
+- [ ] Tested on DSM 7.2+ with Container Manager 24.0.2+
+- [ ] Pi-hole v6 compatibility verified (Alpine image, `FTLCONF_` variables)
 - [ ] README updated if needed
 - [ ] No hardcoded credentials/IPs (use placeholders)
 - [ ] Tested on actual Synology hardware (or document testing approach)
+- [ ] docker-compose.yml syntax compatible with both `docker-compose` and `docker compose`
 
 ## Style Guide
 

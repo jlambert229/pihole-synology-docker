@@ -1,11 +1,14 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
 # Pi-hole v6 on Synology NAS (macvlan network)
 #
+# Pi-hole v6 (February 2025+) uses Alpine base image and FTLCONF_ environment variables.
+# All settings via environment variables are READ-ONLY (cannot be changed via web UI).
+#
 # Pi-hole gets its own IP on the LAN via macvlan.
 # This avoids port conflicts with DSM and gives DNS a dedicated address.
 #
 # Prerequisites:
-#   1. Install Container Manager from DSM Package Center
+#   1. Install Container Manager 24.0.2+ from DSM Package Center (DSM 7.2+)
 #   2. Create data directories:
 #      sudo mkdir -p /volume1/docker/pihole/{etc-pihole,etc-dnsmasq.d}
 #   3. Copy .env.example to .env and set PIHOLE_PASSWORD
@@ -13,9 +16,14 @@
 #
 # Usage:
 #   docker-compose up -d
+#   # or with new syntax:
+#   docker compose up -d
 #
 # Web UI:
 #   http://<PIHOLE_IP>/admin
+#
+# Upgrade notes:
+#   https://docs.pi-hole.net/docker/upgrading/v5-v6/
 
 services:
   pihole:
@@ -34,8 +42,9 @@ services:
     environment:
       TZ: ${TZ:-UTC}
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD:-}
-      FTLCONF_dns_upstreams: '1.1.1.1;1.0.0.1'    # Cloudflare (change if preferred)
+      FTLCONF_dns_upstreams: '1.1.1.1;1.0.0.1'    # Cloudflare (change if preferred); use semicolon for multiple
       FTLCONF_dns_listeningMode: all
+      FTLCONF_misc_etc_dnsmasq_d: 'true'           # Pi-hole v6: Enable /etc/dnsmasq.d/ config files (disabled by default)
       DNSMASQ_USER: root    # Required on Synology — see pihole/docker-pi-hole#963
     volumes:
       - /volume1/docker/pihole/etc-pihole:/etc/pihole

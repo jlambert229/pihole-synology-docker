@@ -4,6 +4,19 @@ Network-wide ad blocking and local DNS running on your Synology NAS. No dedicate
 
 > **Companion repo for:** [Running Pi-hole on Synology NAS with Docker](https://foggyclouds.io/post/pihole-synology-docker)
 
+## 🚨 Pi-hole v6 Note
+
+This repo uses **Pi-hole v6** (released February 2025). Key changes from v5:
+
+- **Alpine-based image** — Significantly smaller (~150MB vs ~300MB)
+- **`FTLCONF_` environment variables** — All old variables replaced (see [Environment Variables](#2-environment-variables-env) section)
+- **Embedded web server** — No more lighttpd/PHP dependency
+- **Native HTTPS support** — Built-in TLS with custom or auto-generated certificates
+- **`/etc/dnsmasq.d/` disabled by default** — Must enable explicitly (see [Custom DNS](#custom-dns-config99-customconf) section)
+- **Environment variables are read-only** — Settings via env vars cannot be changed through web UI
+
+**Upgrading from v5?** See [Pi-hole's upgrade guide](https://docs.pi-hole.net/docker/upgrading/v5-v6/). Configuration files migrate automatically, but **environment variables must be updated manually**.
+
 ## Why This Setup
 
 - **macvlan networking** — Pi-hole gets its own LAN IP (e.g., `192.168.1.53`), avoiding port conflicts with DSM
@@ -15,9 +28,10 @@ Network-wide ad blocking and local DNS running on your Synology NAS. No dedicate
 ## Quick Start
 
 **Prerequisites:**
-- Synology NAS with DSM 7+ and Container Manager installed
+- Synology NAS with DSM 7.2+ and Container Manager 24.0.2+ installed
 - SSH key-based auth to your NAS
 - An unused IP on your LAN for Pi-hole
+- Basic familiarity with `docker-compose` (DSM 7.2+ requires YAML-based container management)
 
 **Deploy in 5 minutes:**
 
@@ -76,6 +90,25 @@ vi deploy.sh            # Set NAS_USER, NAS_IP
 - Now Synology can reach Pi-hole at its macvlan IP
 - Automatically persists across reboots via DSM's `rc.d`
 
+## DSM 7.2+ Container Manager Notes
+
+**Important workflow change:** As of DSM 7.2 (Container Manager 24.0.2+), container settings **cannot be modified after creation**. To change ports, volumes, environment variables, or links:
+
+1. Use `docker-compose` projects (YAML-based approach) — **Required for this setup**
+2. Or duplicate the container via GUI and recreate with new settings
+
+This repo uses `docker-compose.yml` exclusively, so you can modify settings and redeploy with:
+
+```bash
+./deploy.sh
+```
+
+**Other DSM 7.2+ changes:**
+- Docker daemon updated to 24.0.2
+- Native `docker compose` command support (new syntax without hyphen)
+- Customizable subnet settings for Container Manager networks
+- Immutable container configurations enforced by GUI
+
 ## Configuration
 
 ### 1. Docker Compose (`docker-compose.yml`)
@@ -111,11 +144,27 @@ vi .env
 
 ```bash
 # Web interface password (leave empty for no password — not recommended)
+# Pi-hole v6 uses FTLCONF_ prefix for all settings
 PIHOLE_PASSWORD=your-secure-password
 
 # Timezone — https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 TZ=America/New_York
 ```
+
+**Pi-hole v6 Variable Changes:**
+
+All environment variables now use the `FTLCONF_` prefix. Common variables:
+
+| Setting | Environment Variable | Default |
+|---------|---------------------|---------|
+| Web password | `FTLCONF_webserver_api_password` | (none) |
+| Upstream DNS | `FTLCONF_dns_upstreams` | `8.8.8.8;8.8.4.4` |
+| DNS cache size | `FTLCONF_dns_cache_size` | `10000` |
+| Listening mode | `FTLCONF_dns_listeningMode` | `all` |
+| DNSSEC | `FTLCONF_dns_dnssec` | `false` |
+| Web UI port | `FTLCONF_webserver_port` | `80` (or `8080` if conflict) |
+
+**Important:** Environment variables in Pi-hole v6 are **read-only** — values set via env vars cannot be changed through the web UI or CLI. The env var always overrides other settings.
 
 ### 3. Deployment Script (`deploy.sh`)
 
@@ -287,18 +336,23 @@ Three-tier approach:
 | **Recommended** | Broader coverage, occasional false positive | Enabled |
 | **Aggressive** | Maximum blocking, expect breakage | Disabled |
 
-**Essential lists:**
-- StevenBlack unified (~130k domains)
-- OISD Big (~1.5M domains, excellent maintenance)
-- HaGeZi Multi Pro (ads/tracking/malware)
+**Essential lists (2026 recommendations):**
+- **HaGeZi Multi Pro** — Considered the best blocklist as of 2026; precision targeting of ads, tracking, malware, telemetry
+- **OISD Big** (~1.5M domains) — Excellent stability and wide compatibility, the "safe daily driver" option
+- **StevenBlack unified** (~130k domains) — Classic community favorite, Pi-hole default
+
+**Philosophy differences:**
+- **HaGeZi**: Aggressive precision blocking; deeper silence but occasional breakage requiring manual fixes
+- **OISD**: Prioritizes stability and compatibility; avoids gray areas that might break apps
 
 **Recommended lists:**
 - Firebog curated (AdGuard, EasyList, EasyPrivacy)
-- Malware/phishing protection
+- Malware/phishing protection (DandelionSprout, DigitalSide Threat Intel, Phishing Army)
 
 **Aggressive lists (disabled by default):**
-- HaGeZi Ultimate (will break things)
-- OISD NSFW (adult content filter)
+- **HaGeZi Ultimate** — Maximum security for technical users; expect significant breakage
+- **OISD NSFW** — Adult content filter (useful for family networks)
+- **StevenBlack fakenews + gambling** — Blocks misinformation and gambling sites
 
 ### Whitelist (`config/whitelist.txt`)
 
@@ -323,6 +377,20 @@ Pattern-based blocking for domains that rotate subdomains:
 - Content farms (Taboola, Outbrain, Revcontent)
 
 ### Custom DNS (`config/99-custom.conf`)
+
+**⚠️ Pi-hole v6 Change:** By default, Pi-hole v6 **does not read** `/etc/dnsmasq.d/` configuration files. To enable custom dnsmasq configs:
+
+1. **Option A (Recommended):** Mount the config directory and enable in `docker-compose.yml`:
+   ```yaml
+   environment:
+     FTLCONF_misc_etc_dnsmasq_d: 'true'
+   ```
+
+2. **Option B:** Use inline configuration via environment variable:
+   ```yaml
+   environment:
+     FTLCONF_misc_dnsmasq_lines: 'host-record=nas.lan,192.168.1.2;host-record=pihole.lan,192.168.1.53'
+   ```
 
 **Local DNS records:**
 ```bash
@@ -439,6 +507,47 @@ DSM updates sometimes reset network settings. Verify:
 2. DSM DNS points to localhost: DSM → Network → General
 3. Router DHCP still advertising Pi-hole
 
+### Pi-hole v6 Specific Issues
+
+**Custom dnsmasq configs not loading:**
+
+Pi-hole v6 disables `/etc/dnsmasq.d/` by default. Add to `docker-compose.yml`:
+
+```yaml
+environment:
+  FTLCONF_misc_etc_dnsmasq_d: 'true'
+```
+
+Then restart: `ssh nas-ip "cd /volume1/docker/pihole && sudo docker-compose restart"`
+
+**Environment variables not taking effect:**
+
+- Verify `FTLCONF_` prefix (not old `WEBPASSWORD`, `PIHOLE_DNS_`, etc.)
+- Array values (like upstream DNS) must use semicolons: `'1.1.1.1;1.0.0.1'`
+- Settings via env vars are **read-only** — cannot be changed via web UI
+
+**Web UI on wrong port:**
+
+If port 80/443 are taken, Pi-hole v6 falls back to port 8080. Check:
+
+```bash
+ssh nas-ip "sudo docker logs pihole | grep -i port"
+```
+
+Force a specific port:
+
+```yaml
+environment:
+  FTLCONF_webserver_port: '8080'
+```
+
+**Upgrading from v5 to v6:**
+
+Migration runs automatically, but:
+1. **Backup volumes first** (irreversible config changes)
+2. Update `docker-compose.yml` to use `FTLCONF_` variables
+3. Remove old env vars (see [upgrade guide](https://docs.pi-hole.net/docker/upgrading/v5-v6/))
+
 ## File Reference
 
 ```
@@ -467,15 +576,37 @@ DSM updates sometimes reset network settings. Verify:
 Tested on a 4-bay Synology NAS (Celeron J-series, 8GB RAM):
 
 - **CPU:** <1% idle, <5% during blocklist updates
-- **RAM:** ~150MB
-- **Storage:** ~500MB (container + config)
+- **RAM:** ~100-150MB (Pi-hole v6 is more efficient than v5)
+- **Storage:** ~150MB (Pi-hole v6 Alpine image) + ~350MB config = ~500MB total
+- **Image size:** v6 Alpine (~150MB) vs v5 Debian (~300MB) — 50% reduction
 
 **Query response times:**
 - Cached: <1ms
 - Blocked: <1ms
 - Forwarded upstream: 10-20ms
 
+**Pi-hole v6 performance improvements:**
+- Embedded web server replaces lighttpd/PHP stack
+- Reduced memory footprint
+- Faster web UI response with server-side pagination
+
 ## Why These Choices
+
+### Pi-hole v6 vs v5
+
+**Pi-hole v6 advantages:**
+- **Smaller footprint:** Alpine-based image (~150MB vs ~300MB Debian)
+- **Embedded web server:** No lighttpd/PHP dependencies; simpler, faster
+- **Native HTTPS:** Built-in TLS support without reverse proxy
+- **Consolidated config:** Single `/etc/pihole/pihole.toml` file replaces scattered configs
+- **Improved API:** RESTful API with server-side pagination
+
+**Trade-offs:**
+- **Breaking changes:** Environment variables require migration to `FTLCONF_` syntax
+- **Read-only env vars:** Settings via environment cannot be changed through web UI (by design for container immutability)
+- **dnsmasq.d disabled:** Custom dnsmasq configs require explicit opt-in
+
+**Why upgrade?** Better performance, reduced resource usage, and modern architecture. The breaking changes are one-time migration effort.
 
 ### macvlan vs Host Networking
 
@@ -489,6 +620,25 @@ Tested on a 4-bay Synology NAS (Celeron J-series, 8GB RAM):
 - Slightly more complex setup
 
 **Why macvlan?** DSM may want port 53 for its own services. macvlan is cleaner long-term.
+
+### Network Planning Best Practices (2026)
+
+When configuring macvlan on Synology:
+
+**CIDR Alignment:**
+- Plan IP ranges in CIDR-sized subnets to avoid conflicts
+- Align DHCP ranges, static assignments, and container IPs within proper CIDR boundaries
+- Example: Use `192.168.1.0/24` with DHCP in `192.168.1.100-200`, static devices in `192.168.1.2-50`, containers in `192.168.1.51-99`
+
+**IP Range Restriction:**
+- Use `/32` notation in `docker-compose.yml` to restrict Docker to exactly one IP
+- Example: `ip_range: 192.168.1.53/32` ensures only this IP is used
+- Prevents Docker from grabbing multiple IPs from your pool
+
+**Host Communication:**
+- The macvlan shim creates a bridge interface on the Synology host
+- This solves the inherent macvlan isolation problem (host ↔ container)
+- Without the shim, your NAS cannot reach Pi-hole (breaks DSM DNS resolution)
 
 ### Teleporter + Volume Backups
 
@@ -528,12 +678,13 @@ MIT License — see [LICENSE](LICENSE)
 
 ## Acknowledgments
 
-- [Pi-hole](https://pi-hole.net/) — The network-wide ad blocker
-- [StevenBlack hosts](https://github.com/StevenBlack/hosts) — Unified hosts blocklist
-- [OISD](https://oisd.nl/) — Comprehensive blocklist
-- [HaGeZi DNS Blocklists](https://github.com/hagezi/dns-blocklists) — Multi-tier protection
-- Synology community for DSM Docker quirks
-- Reddit's r/pihole for troubleshooting patterns
+- [Pi-hole v6](https://pi-hole.net/) — The network-wide ad blocker (February 2025 release)
+- [HaGeZi DNS Blocklists](https://github.com/hagezi/dns-blocklists) — Best-in-class 2026 blocklists with multi-tier protection
+- [OISD](https://oisd.nl/) — Stability-focused comprehensive blocklist
+- [StevenBlack hosts](https://github.com/StevenBlack/hosts) — Classic unified hosts blocklist
+- Synology community for DSM 7.2+ Container Manager insights
+- Reddit's r/pihole for troubleshooting patterns and v6 migration help
+- Pi-hole community for comprehensive v6 documentation
 
 ---
 

@@ -1,4 +1,4 @@
-# Pi-hole Adlists — Curated blocklists
+# Pi-hole Adlists — Curated blocklists (2026 recommendations)
 #
 # Format: url,enabled,comment
 # enabled: 1 = active, 0 = disabled (available but not blocking)
@@ -10,20 +10,27 @@
 #   Recommended — Broader coverage, occasional false positive
 #   Aggressive  — Maximum blocking, expect some breakage (disabled by default)
 #
+# Philosophy:
+#   HaGeZi  — Precision/depth approach; aggressive targeting, occasional breakage
+#   OISD    — Stability/compatibility; "safe daily driver", minimal friction
+#
 # ──────────────────────────────────────────────────────────────
-# Essential — start here
+# Essential — start here (2026: HaGeZi considered best-in-class)
 # ──────────────────────────────────────────────────────────────
 
-# StevenBlack unified hosts — ads + malware (Pi-hole default)
-https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts,1,StevenBlack unified hosts (default)
+# HaGeZi Multi Pro — BEST blocklist as of 2026
+# Precision targeting: ads, tracking, metrics, telemetry, phishing, malware
+# Expect occasional breakage requiring manual whitelist additions
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/pro.txt,1,HaGeZi Multi Pro — best-in-class 2026
 
-# OISD Big — one of the most popular all-in-one lists
-# Curated from 50+ sources, aggressive dedup, actively maintained
-https://big.oisd.nl/domainswild2,1,OISD Big — comprehensive all-in-one
+# OISD Big — Stability-focused comprehensive list
+# ~1.5M domains from 50+ sources; excellent for "set and forget"
+# Prioritizes compatibility, avoids breaking apps/logins
+https://big.oisd.nl/domainswild2,1,OISD Big — stable daily driver
 
-# HaGeZi Multi Pro — fast-growing, excellent maintenance
-# Blocks ads, tracking, metrics, telemetry, phishing, malware
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/pro.txt,1,HaGeZi Multi Pro — ads/tracking/malware
+# StevenBlack unified hosts — Classic community favorite
+# ~130k domains; ads + malware (Pi-hole's traditional default)
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts,1,StevenBlack unified — classic default
 
 # ──────────────────────────────────────────────────────────────
 # Recommended — broader coverage
@@ -45,11 +52,21 @@ https://phishing.army/download/phishing_army_blocklist_extended.txt,1,Phishing A
 # Aggressive — disabled by default (flip to 1 if you want max blocking)
 # ──────────────────────────────────────────────────────────────
 
-# HaGeZi Ultimate — very aggressive, will break some things
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/ultimate.txt,0,HaGeZi Ultimate — aggressive (expect breakage)
+# HaGeZi Ultimate — Maximum security for technical users
+# Very aggressive; expect significant breakage requiring active whitelist maintenance
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/ultimate.txt,0,HaGeZi Ultimate — max security (experts only)
 
-# OISD NSFW — blocks adult content (useful for family networks)
+# OISD NSFW — Adult content filter (useful for family networks)
 https://nsfw.oisd.nl/domainswild2,0,OISD NSFW — adult content filter
 
-# StevenBlack fakenews + gambling extensions
+# StevenBlack fakenews + gambling — Misinformation and gambling sites
 https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts,0,StevenBlack fakenews + gambling
+
+# ──────────────────────────────────────────────────────────────
+# "Set and Forget" Alternative (2026 recommendation)
+# ──────────────────────────────────────────────────────────────
+# For minimal maintenance, consider using ONLY these HaGeZi lists:
+# - Multi (general): https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/multi.txt
+# - Popupads: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/popupads.txt
+# - TIF (threat intel): https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/tif.txt
+# - Fake (scams/malicious TLDs): https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/fake.txt
