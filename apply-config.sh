@@ -106,6 +106,10 @@ if $DO_ADLISTS; then
             enabled=$(echo "$enabled" | xargs)
             comment=$(echo "$comment" | xargs)
 
+            # Escape single quotes for SQL (prevent injection)
+            url="${url//\'/\'\'}"
+            comment="${comment//\'/\'\'}"
+
             if echo "$CURRENT" | grep -qF "$url"; then
                 SKIPPED=$((SKIPPED + 1))
                 continue
@@ -141,6 +145,9 @@ if $DO_WHITELIST; then
         while IFS= read -r domain; do
             [[ "$domain" =~ ^#.*$ ]] || [[ -z "$domain" ]] && continue
             domain=$(echo "$domain" | xargs)
+
+            # Escape single quotes for SQL (prevent injection)
+            domain="${domain//\'/\'\'}"
 
             if echo "$CURRENT" | grep -qxF "$domain"; then
                 SKIPPED=$((SKIPPED + 1))

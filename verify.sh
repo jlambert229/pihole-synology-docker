@@ -64,6 +64,7 @@ fi
 hdr "DNS Resolution"
 # ─────────────────────────────────────────────
 if dig +short +timeout=5 +tries=1 @"${PIHOLE_IP}" google.com >/dev/null 2>&1; then
+    RESULT
     RESULT=$(dig +short +timeout=5 @"${PIHOLE_IP}" google.com | head -1)
     ok "google.com → ${RESULT}"
 else
@@ -71,6 +72,7 @@ else
 fi
 
 if dig +short +timeout=5 +tries=1 @"${PIHOLE_IP}" cloudflare.com >/dev/null 2>&1; then
+    RESULT
     RESULT=$(dig +short +timeout=5 @"${PIHOLE_IP}" cloudflare.com | head -1)
     ok "cloudflare.com → ${RESULT}"
 else
@@ -81,6 +83,7 @@ fi
 hdr "Ad Blocking"
 # ─────────────────────────────────────────────
 # Test a well-known ad/tracking domain — Pi-hole should return 0.0.0.0 or NXDOMAIN
+AD_RESULT
 AD_RESULT=$(dig +short +timeout=5 +tries=1 @"${PIHOLE_IP}" ads.google.com 2>/dev/null || echo "QUERY_FAILED")
 if [[ "$AD_RESULT" == "0.0.0.0" ]] || [[ -z "$AD_RESULT" ]]; then
     ok "ads.google.com → blocked (${AD_RESULT:-NXDOMAIN})"
@@ -90,6 +93,7 @@ else
     warn "ads.google.com → ${AD_RESULT} (may not be in default blocklist, or gravity still loading)"
 fi
 
+TRACKER_RESULT
 TRACKER_RESULT=$(dig +short +timeout=5 +tries=1 @"${PIHOLE_IP}" tracking.example.com 2>/dev/null || echo "QUERY_FAILED")
 if [[ "$TRACKER_RESULT" == "0.0.0.0" ]] || [[ -z "$TRACKER_RESULT" ]]; then
     ok "tracking.example.com → blocked"
