@@ -1,5 +1,8 @@
 # Pi-hole on Synology NAS with Docker
 
+![pre-commit](https://github.com/jlambert229/pihole-synology-docker/actions/workflows/pre-commit.yml/badge.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/jlambert229/pihole-synology-docker)
+
 Network-wide ad blocking and local DNS running on your Synology NAS. No dedicated hardware required — uses Docker with macvlan networking for clean IP separation.
 
 > **Companion repo for:** [Running Pi-hole on Synology NAS with Docker](https://foggyclouds.io/post/pihole-synology-docker)
